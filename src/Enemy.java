@@ -17,6 +17,9 @@ import java.awt.*;
 		public Rectangle rec;
 		public Image pic;
 		public int hits;
+		public boolean isIntersecting;
+
+		public int health;
 
 		// METHOD DEFINITION SECTION
 
@@ -33,6 +36,7 @@ import java.awt.*;
 			isAlive = true;
 			hits = 0;
 			rec = new Rectangle(xpos, ypos, width, height);
+			isIntersecting=false;
 
 
 		} // constructor
@@ -44,12 +48,15 @@ import java.awt.*;
 			ypos = pYpos;
 			width = 50;
 			height = 50;
+			health= 4;
 			dx = dxParameter;
 			dy = dyParameter;
 			pic = picParameter;
 			isAlive = true;
 			hits = 0;
 			rec = new Rectangle(xpos, ypos, width, height);
+			isIntersecting=false;
+
 
 
 		} // constructor
@@ -60,11 +67,11 @@ import java.awt.*;
 			xpos = xpos + dx;
 			ypos = ypos + dy;
 
-			if (xpos > 1000 - width || xpos < 0) {
+			if (xpos > 1000 - width || xpos < 200) {
 				dx = -dx;
 			}
 
-			if (ypos < 0 || ypos + height > 700) {
+			if (ypos < 200 || ypos + height > 700) {
 				dy = -dy;
 			}
 

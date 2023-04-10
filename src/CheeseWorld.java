@@ -7,6 +7,8 @@
 
 //Graphics Libraries
 
+import com.sun.org.apache.xerces.internal.impl.xs.SchemaSymbols;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.awt.*;
@@ -46,6 +48,7 @@ public class CheeseWorld implements Runnable, KeyListener {
     public Image chipPic;
 
     public Image bearPic;
+    public int score;
 
 
     //Declare the character objects
@@ -56,6 +59,7 @@ public class CheeseWorld implements Runnable, KeyListener {
     public Enemy milly;
     public Rock pal;
     public Rock[] bunch;
+    public int rocknumber = 0;
 
     public slingshot theslingshot;
     public Player user;
@@ -92,15 +96,15 @@ public class CheeseWorld implements Runnable, KeyListener {
 
         //create (construct) the objects needed for the game
         //mouse1 = new Mouse(200, 300, 4, 4, mousePic);
-        sally= new Enemy( 400, 300, 3, 3, enemyPic);
-        milly= new Enemy( 200, 150, 3, 3, chipPic);
-        grizzly= new Enemy( 300, 180, 3, 3, bearPic);
+        sally= new Enemy( 400, 500, 3, 3, enemyPic);
+        milly= new Enemy( 200, 650, 3, 3, chipPic);
+        grizzly= new Enemy( 300, 600, 3, 3, bearPic);
         theslingshot = new slingshot( 100, 300, 0, 0, slingshotPic);
         pal= new Rock(theslingshot.xpos+10, theslingshot.ypos+25,0, 0, rockPic);
         user = new Player(250, 250, 0, 0, tomPic);
 
         bunch= new Rock[30];
-for(int a=0;a<30; a=a+1)
+        for(int a=0;a<bunch.length; a=a+1)
         {
             bunch[a]= new Rock(theslingshot.xpos+10, theslingshot.ypos+25,0, 0, rockPic);
 
@@ -118,33 +122,52 @@ for(int a=0;a<30; a=a+1)
         //mouse1.move();
         theslingshot.move();
         user.move();
-        pal.move();
+       // pal.move();
         sally.move();
         milly.move();
         grizzly.move();
+
+        for(int a=0;a<bunch.length; a=a+1) {
+            if (bunch[a].isAlive == true) {
+                bunch[a].move();
+            }
+        }
     }
 
     //collision
     public void collision () {
-        if(pal.rec.intersects(grizzly.rec)) {
-            grizzly.isAlive = false;
-            System.out.println("grizzly is dead");
-        }
 
-        if(pal.rec.intersects(milly.rec)) {
+        for(int a=0;a<30; a=a+1)
+        {
+            if(bunch[a].rec.intersects(grizzly.rec)&& bunch[a].dx>0 && grizzly.isIntersecting==false){
+                if(grizzly.health==0){
+                grizzly.isAlive=false;}
+                grizzly.health--;//this means grizzly.health=grizzly.health-1;
+                grizzly.isIntersecting=true;
+                score=score+5;
+            }
+            if(bunch[a].rec.intersects(grizzly.rec)==false){
+                grizzly.isIntersecting=false;
+
+            }
+        }//loops through all the rocks in the bunch and checks if they intersect with grizzly
+
+        for(int a=0;a<30; a=a+1)
+        {
+        if(bunch[a].rec.intersects(milly.rec)&& bunch[a].dx>0) {
             milly.isAlive = false;
-            System.out.println("milly is dead");
-
+            score = score + 5;
+        }
         }
 
-        if(pal.rec.intersects(sally.rec)) {
+        for(int a=0;a<30; a=a+1)
+        {
+        if(bunch[a].rec.intersects(sally.rec)&& bunch[a].dx>0) {
             sally.isAlive = false;
-            System.out.println("sally is dead");
+            score = score + 5;
         }
 
-
-
-
+        }
 
     }
 
@@ -184,14 +207,23 @@ for(int a=0;a<30; a=a+1)
         }
         g.drawImage(rockPic, pal.xpos, pal.ypos, pal.width, pal.height,  null);
 
+        for(int a=0;a<bunch.length; a=a+1) {
+            if (bunch[a].isAlive == true) {
+                g.drawImage(rockPic, bunch[a].xpos, bunch[a].ypos, bunch[a].width, bunch[a].height, null);
+            }
+        }
+            g.setColor(Color.BLUE);
+            g.setFont(new Font("TimesRoman", Font.BOLD, 25));
+            g.drawString("score" + score, 900, 50);
 
-       // g.drawImage(mouse1.pic, mouse1.xpos, mouse1.ypos, mouse1.width, mouse1.height, null);
+        // g.drawImage(mouse1.pic, mouse1.xpos, mouse1.ypos, mouse1.width, mouse1.height, null);
         //g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
         g.drawImage(theslingshot.pic, theslingshot.xpos, theslingshot.ypos, theslingshot.width, theslingshot.height, null);
 
         g.dispose();
         bufferStrategy.show();
     }
+
 
     /***
      * Step 3 for keyboard control - add required methods
@@ -220,7 +252,12 @@ for(int a=0;a<30; a=a+1)
         }
 
         if (keyCode == 32) { // spacebar
-            pal.dx = 40;
+//            pal.dx = 40;
+            bunch[rocknumber].isAlive = true;
+            bunch[rocknumber].dx = 40;
+            System.out.println("rocknumber test: " +rocknumber);
+            rocknumber++;
+
         }
 
     }//keyPressed()
