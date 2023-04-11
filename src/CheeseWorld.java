@@ -48,6 +48,10 @@ public class CheeseWorld implements Runnable, KeyListener {
     public Image chipPic;
 
     public Image bearPic;
+
+    public Image gamestart;
+
+    public Image gameover;
     public int score;
 
 
@@ -60,6 +64,8 @@ public class CheeseWorld implements Runnable, KeyListener {
     public Rock pal;
     public Rock[] bunch;
     public int rocknumber = 0;
+
+    public boolean gameStart = true;
 
     public slingshot theslingshot;
     public Player user;
@@ -91,6 +97,8 @@ public class CheeseWorld implements Runnable, KeyListener {
         tomPic = Toolkit.getDefaultToolkit().getImage("tomCat.png");
         slingshotPic= Toolkit.getDefaultToolkit().getImage("slingshot.png");
         campPic= Toolkit.getDefaultToolkit().getImage("camp.png");
+        gamestart=Toolkit.getDefaultToolkit().getImage("gamestart.jpeg");
+        gameover = Toolkit.getDefaultToolkit().getImage("game over.jpeg");
 
 
 
@@ -103,7 +111,7 @@ public class CheeseWorld implements Runnable, KeyListener {
         pal= new Rock(theslingshot.xpos+10, theslingshot.ypos+25,0, 0, rockPic);
         user = new Player(250, 250, 0, 0, tomPic);
 
-        bunch= new Rock[30];
+        bunch= new Rock[10];
         for(int a=0;a<bunch.length; a=a+1)
         {
             bunch[a]= new Rock(theslingshot.xpos+10, theslingshot.ypos+25,0, 0, rockPic);
@@ -137,39 +145,52 @@ public class CheeseWorld implements Runnable, KeyListener {
     //collision
     public void collision () {
 
-        for(int a=0;a<30; a=a+1)
+        for(int a=0;a<bunch.length; a=a+1)
         {
-            if(bunch[a].rec.intersects(grizzly.rec)&& bunch[a].dx>0 && grizzly.isIntersecting==false){
+            if (bunch[a].rec.intersects(grizzly.rec)&& bunch[a].dx>0 && grizzly.isIntersecting==false){
                 if(grizzly.health==0){
                 grizzly.isAlive=false;}
                 grizzly.health--;//this means grizzly.health=grizzly.health-1;
                 grizzly.isIntersecting=true;
                 score=score+5;
+                grizzly.width = grizzly.width- 5;
+                grizzly.height = grizzly.height- 5;
             }
             if(bunch[a].rec.intersects(grizzly.rec)==false){
                 grizzly.isIntersecting=false;
 
             }
         }//loops through all the rocks in the bunch and checks if they intersect with grizzly
-
-        for(int a=0;a<30; a=a+1)
+        for(int a=0;a<10; a=a+1)
         {
-        if(bunch[a].rec.intersects(milly.rec)&& bunch[a].dx>0) {
-            milly.isAlive = false;
-            score = score + 5;
-        }
-        }
+            if(bunch[a].rec.intersects(sally.rec)&&bunch[a].dx>0 && sally.isIntersecting==false){
+                score=score+5;
+                if(sally.health==0){
+                    sally.isAlive=false;
+                }
+                sally.health--;//this means grizzly.health=grizzly.health-1;
+                sally.width = sally.width- 5;
+                sally.height = sally.height- 5;
 
-        for(int a=0;a<30; a=a+1)
-        {
-        if(bunch[a].rec.intersects(sally.rec)&& bunch[a].dx>0) {
-            sally.isAlive = false;
-            score = score + 5;
+            }
         }
+        for(int a=0;a<10; a=a+1) {
+            if (bunch[a].rec.intersects(milly.rec) && bunch[a].dx > 0 && milly.isIntersecting==false) {
+                score = score + 5;
+                if(milly.health==0){
+                    milly.isAlive=false;
+                }
+                milly.health--;//this means grizzly.health=grizzly.health-1;
+                milly.width = milly.width- 5;
+                milly.height = milly.height- 5;
 
+            }
         }
 
     }
+
+
+
 
 
     public void checkIntersections() {
@@ -189,36 +210,59 @@ public class CheeseWorld implements Runnable, KeyListener {
 
     //paints things on the screen using bufferStrategy
     public void render() {
+        //boolean startscreen=true;
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
         g.clearRect(0, 0, WIDTH, HEIGHT);
+      /*  if(startscreen==true){
+            g.setColor(Color.RED);
+            g.drawRect(0,0,WIDTH,HEIGHT);
 
+        }*/
         //draw characters to the screen
-        g.drawImage(campPic, 0, 0, 1000, 700, null);
-        if(grizzly.isAlive==true) {
-            g.drawImage(bearPic, grizzly.xpos, grizzly.ypos,grizzly.width, grizzly.height, null);
-        }
 
-        if(milly.isAlive == true) {
-            g.drawImage(chipPic, milly.xpos, milly.ypos, milly.width, milly.height, null);
-        }
+        if(gameStart){
+            g.drawImage(gamestart, 0, 0, 1000, 700, null);
 
-        if(sally.isAlive == true) {
-            g.drawImage(enemyPic, sally.xpos, sally.ypos, sally.width, sally.height, null);
-        }
-        g.drawImage(rockPic, pal.xpos, pal.ypos, pal.width, pal.height,  null);
-
-        for(int a=0;a<bunch.length; a=a+1) {
-            if (bunch[a].isAlive == true) {
-                g.drawImage(rockPic, bunch[a].xpos, bunch[a].ypos, bunch[a].width, bunch[a].height, null);
+        }else{
+            g.drawImage(campPic, 0, 0, 1000, 700, null);
+            if(grizzly.isAlive==true) {
+                g.drawImage(bearPic, grizzly.xpos, grizzly.ypos,grizzly.width, grizzly.height, null);
             }
-        }
+
+            if(milly.isAlive == true) {
+                g.drawImage(chipPic, milly.xpos, milly.ypos, milly.width, milly.height, null);
+            }
+
+            if(sally.isAlive == true) {
+                g.drawImage(enemyPic, sally.xpos, sally.ypos, sally.width, sally.height, null);
+            }
+            g.drawImage(rockPic, pal.xpos, pal.ypos, pal.width, pal.height,  null);
+
+            for(int a=0;a<bunch.length; a=a+1) {
+                if (bunch[a].isAlive == true) {
+                    g.drawImage(rockPic, bunch[a].xpos, bunch[a].ypos, bunch[a].width, bunch[a].height, null);
+                }
+            }
             g.setColor(Color.BLUE);
             g.setFont(new Font("TimesRoman", Font.BOLD, 25));
             g.drawString("score" + score, 900, 50);
 
-        // g.drawImage(mouse1.pic, mouse1.xpos, mouse1.ypos, mouse1.width, mouse1.height, null);
-        //g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
-        g.drawImage(theslingshot.pic, theslingshot.xpos, theslingshot.ypos, theslingshot.width, theslingshot.height, null);
+            // g.drawImage(mouse1.pic, mouse1.xpos, mouse1.ypos, mouse1.width, mouse1.height, null);
+            //g.drawImage(user.pic, user.xpos, user.ypos, user.width, user.height, null);
+            g.drawImage(theslingshot.pic, theslingshot.xpos, theslingshot.ypos, theslingshot.width, theslingshot.height, null);
+
+            if(rocknumber==10)
+            {
+                g.drawImage(gameover, 0, 0, 1000, 700, null);
+
+
+
+            }
+
+
+        }
+
+
 
         g.dispose();
         bufferStrategy.show();
@@ -259,6 +303,12 @@ public class CheeseWorld implements Runnable, KeyListener {
             rocknumber++;
 
         }
+
+        if(keyCode==83) {
+            gameStart=false;
+        }
+
+
 
     }//keyPressed()
 
@@ -314,6 +364,7 @@ public class CheeseWorld implements Runnable, KeyListener {
         bufferStrategy = canvas.getBufferStrategy();
         canvas.requestFocus();
         System.out.println("DONE graphic setup");
+
 
     }
 
